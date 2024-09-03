@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier Tutorial</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Image Classifier Tutorial</h1>
+            <p>This tutorial will guide you through building an image classifier using PyTorch. You can follow these steps for various datasets, provided they are organized into `test`, `train`, and `valid` directories.</p>
+        </header>
+
+        <section>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AI Image Classifier Tutorial</title>
+            <link rel="stylesheet" href="styles.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <h1>AI Image Classifier Tutorial</h1>
+                </header>
+
+                <section>
+                    <h2>What Role Do Data Quality and Quantity Play in Training AI Models?</h2>
+
+                    <!-- Slideshow container -->
+                    <div class="slideshow-container">
+
+                        <!-- Slide 1 -->
+                        <div class="mySlides fade">
+                            <div class="numbertext">1 / 3</div>
+                            <p>Data quality and quantity are crucial when training AI models, especially for image classifiers. High-quality images that are clear and well-labeled help the model learn to distinguish between different categories more accurately.</p>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="mySlides fade">
+                            <div class="numbertext">2 / 3</div>
+                            <p>For example, in this butterfly classifier, clear images showing various species from different angles made it easier for the model to learn the differences between them. If the images were blurry or mislabeled, the model would struggle to make accurate predictions.</p>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="mySlides fade">
+                            <div class="numbertext">3 / 3</div>
+                            <p>The more images you have, the better the model can learn. With 12,000+ images in this butterfly classifier, the model had a lot of examples to learn from, making it more accurate. A balanced, high-quality dataset is key to building effective image classifiers.</p>
+                        </div>
+
+                        <!-- Next and previous buttons -->
+                        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                        <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+                    </div>
+                    <br>
+
+                    <!-- The dots/circles -->
+                    <div style="text-align:center">
+                        <span class="dot" onclick="currentSlide(1)"></span> 
+                        <span class="dot" onclick="currentSlide(2)"></span> 
+                        <span class="dot" onclick="currentSlide(3)"></span> 
+                    </div>
+                </section>
+
+                <!-- Rest of the content -->
+                <!-- Add your existing sections here -->
+
+            </div>
+            <script src="script.js"></script>
+        </body>
+        </section>
+
+
+        <section>
+            <h2>Preview</h2>
+            <p>This tutorial will guide you through the process of building an image classifier using PyTorch. We will cover importing libraries, loading and transforming data, defining a Convolutional Neural Network (CNN), training the model, and testing its performance. Before we start, you need to download the dataset from Kaggle:</p>
+            <p><a href="https://www.kaggle.com/datasets/gpiosenka/butterfly-images40-species?select=valid" target="_blank">Download the Butterfly Images Dataset from Kaggle</a></p>
+            <p>Ensure that you download and extract the dataset to your working directory. The dataset contains images of butterflies and moths, categorized into various species. This data will be used for training and testing our image classifier.</p>
+        </section>
+
+        <section>
+            <h2>1. Import Libraries</h2>
+            <pre><code>import torch
+import torchvision
+import torchvision.transforms as transforms
+transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])</code></pre>
+            <p><strong>Explanation:</strong> This code imports the necessary libraries for building and training the image classifier. It also defines a transformation pipeline to normalize the images, which helps improve model performance by ensuring consistent input data.</p>
+        </section>
+
+        <section>
+            <h2>2. Load and Transform Training Data</h2>
+            <pre><code>import os
+from PIL import Image
+import numpy as np
+
+categories = os.listdir('./train')
+
+names_to_labels = dict()
+
+training_images = []
+training_labels = []
+
+for i in range(len(categories)):
+    names_to_labels[categories[i]] = i
+
+for c in categories:
+    files = os.listdir('./train/' + c)
+    for f in files:
+        image = Image.open('./train/' + c + '/' + f)
+        image = image.resize((32,32))
+        image = np.array(image) 
+
+        training_images.append(transform(image))
+        training_labels.append(names_to_labels[c])</code></pre>
+            <p><strong>Explanation:</strong> This section loads the training data from the dataset. It resizes each image to 32x32 pixels and applies the defined transformations. The images and their corresponding labels are then stored in lists for further processing.</p>
+        </section>
+
+        <section>
+            <h2>3. Load and Transform Test Data</h2>
+            <pre><code>categories = os.listdir('./test')
+
+names_to_labels = dict()
+
+test_images = []
+test_labels = []
+
+for i in range(len(categories)):
+    names_to_labels[categories[i]] = i
+
+for c in categories:
+    files = os.listdir('./test/' + c)
+    for f in files:
+        image = Image.open('./test/' + c + '/' + f)
+        image = image.resize((32,32))
+        image = np.array(image) 
+
+        test_images.append(transform(image))
+        test_labels.append(names_to_labels[c])
+
+test_images = torch.stack(test_images)
+test_labels = torch.tensor(test_labels)</code></pre>
+            <p><strong>Explanation:</strong> Similar to the training data, this section processes the test data. It resizes the images, applies the transformations, and converts them into tensors. This ensures that the test data is in the correct format for evaluation.</p>
+        </section>
+
+        <section>
+            <h2>4. Check Data Sizes</h2>
+            <pre><code>print(len(training_images))
+print(len(training_labels))</code></pre>
+            <p><strong>Output:</strong></p>
+            <pre><code>12594
+12594</code></pre>
+            <p><strong>Explanation:</strong> This code prints the number of training images and labels. It helps verify that the data has been loaded correctly and that the dataset size matches expectations.</p>
+        </section>
+
+        <section>
+            <h2>5. Convert Training Data to Tensors</h2>
+            <pre><code>training_images = torch.stack(training_images)
+training_labels = torch.tensor(training_labels)</code></pre>
+            <p><strong>Explanation:</strong> This section converts the lists of training images and labels into tensors. Tensors are the primary data structure used in PyTorch for training and evaluating models.</p>
+        </section>
+
+        <section>
+            <h2>6. Check Test Image Shape</h2>
+            <pre><code>test_images.shape</code></pre>
+            <p><strong>Output:</strong></p>
+            <pre><code>torch.Size([500, 3, 32, 32])</code></pre>
+            <p><strong>Explanation:</strong> This code checks the shape of the test images tensor. It confirms the dimensions of the images, ensuring that they match the expected format for the model.</p>
+        </section>
+
+        <section>
+            <h2>7. Display an Example Image</h2>
+            <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+def imshow(img):
+    img = img / 2 + 0.5     # unnormalize
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
+imshow(training_images[12000])</code></pre>
+            <p><strong>Explanation:</strong> This section uses matplotlib to display an example image from the training set. It helps visualize what the input data looks like.</p>
+        </section>
+
+        <section>
+            <h2>8. Define the CNN Model</h2>
+            <pre><code>from torch import nn, optim
+from torch.functional import F
+
+# Define the CNN model
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, len(categories))  # Adjust the output size based on the number of categories
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1)  # flatten all dimensions except batch
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+# Initialize the model  
+net = Net()</code></pre>
+            <p><strong>Explanation:</strong> This section defines a Convolutional Neural Network (CNN) model. The CNN consists of convolutional layers, pooling layers, and fully connected layers. It is designed to classify images into different categories.</p>
+        </section>
+
+        <section>
+            <h2>9. Define Loss Function and Optimizer</h2>
+            <pre><code># Define the loss function and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)</code></pre>
+            <p><strong>Explanation:</strong> This code sets up the loss function and optimizer for training the model. The loss function measures how well the model performs, while the optimizer updates the model's weights based on the computed gradients.</p>
+        </section>
+
+        <section>
+            <h2>10. Training the Model</h2>
+            <pre><code># Training loop
+num_ex = 500
+batch_size = 320
+
+for ex in range(num_ex):
+    running_loss = 0.0
+    for i in range(0, len(training_images), batch_size):
+        # Get the inputs
+        inputs = training_images[i:i+batch_size]
+        labels = training_labels[i:i+batch_size]
+
+        optimizer.zero_grad()  # Zero the parameter gradients
+        outputs = net(inputs)  # Forward pass
+        loss = criterion(outputs, labels)  # Compute the loss
+        loss.backward()  # Backward pass
+        optimizer.step()  # Update weights
+
+        running_loss += loss.item()
+        if (i // batch_size) % 10 == 0:  # Print every 10 batches
+            print(f"ex [{ex+1}/{num_ex}] Batch [{i // batch_size + 1}] loss: {running_loss / 10:.3f}")
+            running_loss = 0.0
+
+print('Finished Training')  # Indicate that training is complete</code></pre>
+            <p><strong>Explanation:</strong> This code performs the training of the model. It iterates over the training data in batches, performs forward and backward passes, and updates the model's weights based on the computed loss.</p>
+        </section>
+
+        <section>
+            <h2>11. Save the Trained Model</h2>
+            <pre><code># Save the model
+PATH = './butterfly_net.pth'
+torch.save(net.state_dict(), PATH)</code></pre>
+            <p><strong>Explanation:</strong> This code saves the trained model to a file. Saving the model allows you to reuse it later without having to retrain it.</p>
+        </section>
+
+        <section>
+            <h2>12. Evaluate Model Accuracy</h2>
+            <pre><code># Evaluate model accuracy
+correct = 0
+total = 0
+
+for i in range(len(test_images)):
+    outputs = net(test_images[i].unsqueeze(0))
+    _, predicted = torch.max(outputs.data, 1)
+    total += 1
+    correct += (predicted == test_labels[i]).sum().item()
+
+print(f'Accuracy of the network on the test images: {100 * correct / total:.2f}%')</code></pre>
+            <p><strong>Output:</strong></p>
+            <pre><code>Accuracy of the network on the test images</code></pre>
+            <p><strong>Explanation:</strong> This code evaluates the accuracy of the trained model on the test dataset. It calculates the percentage of correctly classified images, providing a measure of the model's performance.</p>
+        </section>
+
+        <section>
+            <h2>13. Install Required Packages</h2>
+            <pre><code>!pip install torch
+!pip install torchvision
+pip install torch torchvision pillow</code></pre>
+            <p><strong>Explanation:</strong> These commands install the necessary packages for running the code, including PyTorch, torchvision, and PIL (Python Imaging Library). Make sure these packages are installed before running the code.</p>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
